@@ -397,8 +397,10 @@
           return;
         }
       } else {
-        if (!/^[a-zA-Z]+$/.test(val)) {
-          updateLog('Error: Solo se aceptan caracteres alfabéticos (letras).', 'text-rose-400');
+        // En el modo alfabético, cada nodo admite exactamente una letra.
+        // Se incluyen letras del español como Ñ y vocales acentuadas.
+        if (!/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]$/u.test(val)) {
+          updateLog('Error: En el modo alfabético solo se permite una letra por nodo.', 'text-rose-400');
           return;
         }
       }
