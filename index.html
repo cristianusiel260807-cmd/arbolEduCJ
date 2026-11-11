@@ -37,17 +37,7 @@
   <!-- Contenedor Principal de Módulos -->
   <main class="flex-grow max-w-7xl w-full mx-auto p-4 flex flex-col gap-4">
 
-    <!-- ==================== MÓDULO 1: SIMULADOR VISUAL ==================== -->
-    <section id="modulo-1" class="flex flex-col gap-4">
-      <!-- Barra de Controles y Operaciones -->
-      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex flex-wrap items-center gap-3">
-          <label class="text-xs text-slate-400 font-semibold uppercase">Modo:</label>
-          <select id="data-type" onchange="handleTypeChange()" class="bg-slate-700 border border-slate-600 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="number">Números</option>
-            <option value="string">Alfabético</option>
-          </select>
-
+   
           <input type="text" id="node-value" placeholder="Número entero..." class="bg-slate-700 border border-slate-600 rounded px-3 py-1.5 text-sm w-36 focus:outline-none focus:ring-2 focus:ring-blue-500">
 
           <button onclick="insertNode()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-semibold transition">Insertar</button>
