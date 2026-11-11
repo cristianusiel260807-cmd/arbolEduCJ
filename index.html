@@ -239,39 +239,51 @@
       delete(val, type = 'number') {
         const parsedVal = type === 'number' ? Number(val) : String(val);
 
-        // Evita que NaN llegue a las comparaciones del árbol.
-        // Con NaN, tanto key < node.value como key > node.value son false,
-        // lo que podría provocar la eliminación accidental de un nodo.
-        if (type === 'number' && !Number.isSafeInteger(parsedVal)) {
-          return false;
-        }
-        if (type === 'string' && !/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]$/u.test(parsedVal)) {
-          return false;
-        }
+        // Validar antes de comparar para evitar eliminaciones incorrectas.
+        if (type === 'number' && !Number.isSafeInteger(parsedVal)) return false;
+        if (type === 'string' && !/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]$/u.test(parsedVal)) return false;
 
-        let deleted = false;
-        const removeNode = (node, key) => {
-          if (!node) return null;
-          if (key < node.value) {
-            node.left = removeNode(node.left, key);
-            return node;
-          } else if (key > node.value) {
-            node.right = removeNode(node.right, key);
-            return node;
-          } else {
-            deleted = true;
-            if (!node.left && !node.right) return null;
-            if (!node.left) return node.right;
-            if (!node.right) return node.left;
-            let temp = node.right;
-            while (temp.left) temp = temp.left;
-            node.value = temp.value;
-            node.right = removeNode(node.right, temp.value);
-            return node;
+        // Extrae físicamente el nodo menor del subárbol derecho.
+        // Esto evita confusiones cuando existen valores duplicados.
+        const extractMin = (node) => {
+          if (!node.left) {
+            return { min: node, remainder: node.right };
           }
+          const result = extractMin(node.left);
+          node.left = result.remainder;
+          result.remainder = node;
+          return result;
         };
-        this.root = removeNode(this.root, parsedVal);
-        return deleted;
+
+        const removeNode = (node, key) => {
+          if (!node) return { node: null, deleted: false };
+
+          if (key < node.value) {
+            const result = removeNode(node.left, key);
+            node.left = result.node;
+            return { node, deleted: result.deleted };
+          }
+
+          if (key > node.value) {
+            const result = removeNode(node.right, key);
+            node.right = result.node;
+            return { node, deleted: result.deleted };
+          }
+
+          // Se encontró una coincidencia: se elimina solo una ocurrencia.
+          if (!node.left) return { node: node.right, deleted: true };
+          if (!node.right) return { node: node.left, deleted: true };
+
+          const result = extractMin(node.right);
+          const successor = result.min;
+          successor.left = node.left;
+          successor.right = result.remainder;
+          return { node: successor, deleted: true };
+        };
+
+        const result = removeNode(this.root, parsedVal);
+        this.root = result.node;
+        return result.deleted;
       }
 
       getHeight(node = this.root) {
