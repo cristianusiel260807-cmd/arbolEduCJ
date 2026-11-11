@@ -223,7 +223,9 @@
         }
         let current = this.root;
         while (true) {
-          if (parsedVal === current.value) return false;
+          // Los valores menores van a la izquierda.
+          // Los valores iguales o mayores van a la derecha.
+          // Así se permiten duplicados sin romper el orden del árbol.
           if (parsedVal < current.value) {
             if (!current.left) { current.left = newNode; return true; }
             current = current.left;
@@ -403,13 +405,11 @@
 
       const inserted = bst.insert(type === 'string' ? val.toUpperCase() : val, type);
       if (inserted) {
-        updateLog(`Nodo '${val}' insertado correctamente.`, 'text-emerald-400');
+        updateLog(`Nodo '${val}' insertado correctamente. Se permiten valores duplicados.`, 'text-emerald-400');
         input.value = '';
         updateStats();
         simHighlights = {};
         simPulse = false;
-      } else {
-        updateLog(`El valor '${val}' ya existe en el árbol.`, 'text-amber-400');
       }
     }
 
