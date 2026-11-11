@@ -237,7 +237,18 @@
       }
 
       delete(val, type = 'number') {
-        const parsedVal = type === 'number' ? parseInt(val, 10) : String(val);
+        const parsedVal = type === 'number' ? Number(val) : String(val);
+
+        // Evita que NaN llegue a las comparaciones del árbol.
+        // Con NaN, tanto key < node.value como key > node.value son false,
+        // lo que podría provocar la eliminación accidental de un nodo.
+        if (type === 'number' && !Number.isSafeInteger(parsedVal)) {
+          return false;
+        }
+        if (type === 'string' && !/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]$/u.test(parsedVal)) {
+          return false;
+        }
+
         let deleted = false;
         const removeNode = (node, key) => {
           if (!node) return null;
@@ -446,6 +457,17 @@
       const type = document.getElementById('data-type').value;
 
       if (!val || !bst.root) return;
+
+      // Valida el dato según el modo seleccionado antes de buscarlo/eliminarlo.
+      if (type === 'number' && !/^-?\\d+$/.test(val)) {
+        updateLog('Error: En el modo Números solo puedes eliminar usando un número entero.', 'text-rose-400');
+        return;
+      }
+      if (type === 'string' && !/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]$/u.test(val)) {
+        updateLog('Error: En el modo Alfabético debes ingresar una sola letra.', 'text-rose-400');
+        return;
+      }
+
       const deleted = bst.delete(type === 'string' ? val.toUpperCase() : val, type);
       if (deleted) {
         updateLog(`Nodo '${val}' eliminado.`, 'text-emerald-400');
