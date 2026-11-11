@@ -477,7 +477,7 @@
 
     function clearTree() {
       bst.root = null;
-      updateLog('El árbol está vacío. Inserta un nodo o presiona 'Aleatorio' para comenzar.', 'text-blue-400');
+      updateLog('El árbol está vacío. Inserta un nodo o presiona \'Aleatorio\' para comenzar.', 'text-blue-400');
       updateStats();
       simHighlights = {};
       simPulse = false;
@@ -664,8 +664,8 @@
 
       const questionTypes = [
         { q: `Escribe el resultado del recorrido In-Orden (Izquierda -> Raíz -> Derecha):`, correctVal: inorderList.join(', ') },
-        { q: `Escribe el recorrido Pre-Orden (Raíz -> Izquierda -> Derecha):`, correctVal: preorderList.join(', ') },
-        { q: `Escribe el recorrido Post-Orden (Izquierda -> Derecha -> Raíz):`, correctVal: postorderList.join(', ') }
+        { q: `Escribe el resultado del recorrido Pre-Orden (Raíz -> Izquierda -> Derecha):`, correctVal: preorderList.join(', ') },
+        { q: `Escribe el resultado del recorrido Post-Orden (Izquierda -> Derecha -> Raíz):`, correctVal: postorderList.join(', ') }
       ];
 
       const selectedQ = questionTypes[Math.floor(Math.random() * questionTypes.length)];
@@ -706,6 +706,7 @@
 
     // --- BUCLE DE RENDERIZADO CONTINUO (REQUEST ANIMATION FRAME) ---
     function gameLoop() {
+      // 1. Renderizar Simulador si está activo
       if (currentModule === 1) {
         simCtx.clearRect(0, 0, simCanvas.width, simCanvas.height);
         if (!bst.root) {
@@ -726,6 +727,7 @@
         }
       }
 
+      // 2. Renderizar Glosario si está activo
       if (currentModule === 2) {
         glossCtx.clearRect(0, 0, glossCanvas.width, glossCanvas.height);
         if (glossTree.root) {
@@ -735,6 +737,7 @@
         }
       }
 
+      // 3. Renderizar Quiz si está activo
       if (currentModule === 3) {
         quizCtx.clearRect(0, 0, quizCanvas.width, quizCanvas.height);
         if (quizTree && quizTree.root) {
@@ -753,6 +756,7 @@
       requestAnimationFrame(gameLoop);
     }
 
+    // Inicialización al cargar la página
     window.onload = () => {
       setupPanZoom(simCanvas, 'sim');
       setupPanZoom(quizCanvas, 'quiz');
