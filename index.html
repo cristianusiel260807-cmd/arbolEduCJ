@@ -471,7 +471,7 @@
       if (!val || !bst.root) return;
 
       // Valida el dato según el modo seleccionado antes de buscarlo/eliminarlo.
-      if (type === 'number' && !/^-?\\d+$/.test(val)) {
+      if (type === 'number' && !/^-?\d+$/.test(val)) {
         updateLog('Error: En el modo Números solo puedes eliminar usando un número entero.', 'text-rose-400');
         return;
       }
