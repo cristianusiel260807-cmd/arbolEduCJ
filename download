@@ -1,0 +1,4 @@
+# Dependencias del sistema / editor
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArbolEduCJ - Árboles Binarios Interactivos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .active-tab {
+      border-bottom: 3px solid #3b82f6;
+      color: #60a5fa;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans select-none">
+
+  <!-- Encabezado y Navegación Principal por Módulos -->
+  <header class="bg-slate-800 border-b border-slate-700 shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-blue-600 rounded-lg text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        </div>
+        <h1 class="text-xl font-bold tracking-tight text-white">ArbolEduCJ</h1>
+      </div>
+
+      <!-- Pestañas de Módulos Principales -->
+      <nav class="flex space-x-1 sm:space-x-4 text-sm font-medium">
+        <button id="btn-mod1" onclick="switchModule(1)" class="px-4 py-2 rounded-t-md transition active-tab">Módulo 1: Simulador Visual</button>
+        <button id="btn-mod2" onclick="switchModule(2)" class="px-4 py-2 rounded-t-md text-slate-400 hover:text-slate-200 transition">Módulo 2: Teoría y Glosario</button>
+        <button id="btn-mod3" onclick="switchModule(3)" class="px-4 py-2 rounded-t-md text-slate-400 hover:text-slate-200 transition">Módulo 3: Quiz Interactivo</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal de Módulos -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 flex flex-col gap-4">
+
+    <!-- ==================== MÓDULO 1: SIMULADOR VISUAL ==================== -->
+    <section id="modulo-1" class="flex flex-col gap-4">
+      <!-- Barra de Controles y Operaciones -->
+      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <label class="text-xs text-slate-400 font-semibold uppercase">Modo:</label>
+          <select id="data-type" onchange="handleTypeChange()" class="bg-slate-700 border border-slate-600 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="number">Números</option>
+            <option value="string">Alfabético</option>
+          </select>
+
+          <input type="text" id="node-value" placeholder="Número entero..." class="bg-slate-700 border border-slate-600 rounded px-3 py-1.5 text-sm w-36 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+          <button onclick="insertNode()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-semibold transition">Insertar</button>
+          <button onclick="searchNode()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded text-sm font-semibold transition">Buscar</button>
+          <button onclick="deleteNode()" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded text-sm font-semibold transition">Eliminar</button>
+          <button onclick="generateRandomTree()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded text-sm font-semibold transition">Aleatorio</button>
+          <button onclick="clearTree()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded text-sm font-semibold transition">Limpiar</button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs text-slate-400 font-semibold uppercase">Velocidad:</span>
+            <input type="range" id="anim-speed" min="0.2" max="3.0" step="0.2" value="1.0" class="w-20 accent-blue-500">
+          </div>
+          <span class="text-xs text-slate-400 font-semibold uppercase">Recorridos:</span>
+          <button onclick="animateTraversal('inorder')" class="bg-indigo-600/80 hover:bg-indigo-600 text-xs px-2.5 py-1.5 rounded transition">In-Orden</button>
+          <button onclick="animateTraversal('preorder')" class="bg-indigo-600/80 hover:bg-indigo-600 text-xs px-2.5 py-1.5 rounded transition">Pre-Orden</button>
+          <button onclick="animateTraversal('postorder')" class="bg-indigo-600/80 hover:bg-indigo-600 text-xs px-2.5 py-1.5 rounded transition">Post-Orden</button>
+        </div>
+      </div>
+
+      <!-- Lienzo Canvas con Desplazamiento e Instrucción -->
+      <div class="bg-slate-950 border border-slate-800 rounded-xl relative overflow-hidden flex-grow min-h-[380px] shadow-inner flex items-center justify-center">
+        <div class="absolute top-3 left-3 z-10 bg-slate-900/80 border border-slate-700 text-slate-400 text-xs px-2.5 py-1 rounded backdrop-blur pointer-events-none">
+          🖐️ Arrastra con el cursor o usa la rueda para desplazar/zoom
+        </div>
+        <div class="absolute top-3 right-3 z-10 flex gap-1 bg-slate-900/80 border border-slate-700 p-1 rounded backdrop-blur">
+          <button onclick="zoomCanvas('sim', 1.2)" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-xs rounded text-slate-200 font-bold">+</button>
+          <button onclick="zoomCanvas('sim', 0.8)" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-xs rounded text-slate-200 font-bold">-</button>
+          <button onclick="resetView('sim')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-xs rounded text-slate-300">Restablecer</button>
+        </div>
+        <canvas id="sim-canvas" width="1000" height="400" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+      </div>
+
+      <!-- Tabla de Datos del Árbol -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div class="bg-slate-800 border border-slate-700 p-3 rounded-lg text-center">
+          <span class="text-xs text-slate-400 block uppercase font-semibold">Altura</span>
+          <span id="stat-height" class="text-lg font-bold text-blue-400">0</span>
+        </div>
+        <div class="bg-slate-800 border border-slate-700 p-3 rounded-lg text-center">
+          <span class="text-xs text-slate-400 block uppercase font-semibold">Nodos</span>
+          <span id="stat-count" class="text-lg font-bold text-emerald-400">0</span>
+        </div>
+        <div class="bg-slate-800 border border-slate-700 p-3 rounded-lg text-center">
+          <span class="text-xs text-slate-400 block uppercase font-semibold">Hojas</span>
+          <span id="stat-leaves" class="text-sm font-bold text-amber-400 truncate block">Ninguna</span>
+        </div>
+        <div class="bg-slate-800 border border-slate-700 p-3 rounded-lg text-center">
+          <span class="text-xs text-slate-400 block uppercase font-semibold">Mínimo</span>
+          <span id="stat-min" class="text-lg font-bold text-purple-400">-</span>
+        </div>
+        <div class="bg-slate-800 border border-slate-700 p-3 rounded-lg text-center col-span-2 sm:col-span-1">
+          <span class="text-xs text-slate-400 block uppercase font-semibold">Máximo</span>
+          <span id="stat-max" class="text-lg font-bold text-rose-400">-</span>
+        </div>
+      </div>
+
+      <!-- Log / Consola de Salida Sincrónica -->
+      <div class="bg-slate-800 border border-slate-700 p-3 rounded-lg flex items-center justify-between text-xs font-mono">
+        <span id="sim-log" class="text-blue-400">El árbol está vacío. Inserta un nodo o presiona 'Aleatorio' para comenzar.</span>
+      </div>
+    </section>
+
+
+    <!-- ==================== MÓDULO 2: TEORÍA Y GLOSARIO ==================== -->
+    <section id="modulo-2" class="hidden flex-col gap-4">
+      <div class="text-center py-2">
+        <h2 class="text-2xl font-bold text-white">Glosario Dinámico de Árboles Binarios</h2>
+        <p class="text-xs text-slate-400 mt-1">Selecciona un concepto para visualizarlo con animaciones fluidas en el árbol</p>
+      </div>
+
+      <!-- Botonera de Términos -->
+      <div class="flex flex-wrap justify-center gap-2 bg-slate-800 p-3 rounded-xl border border-slate-700">
+        <button onclick="selectGlossary('raiz')" class="gloss-btn bg-slate-700 hover:bg-blue-600 px-3 py-1.5 rounded text-xs font-semibold transition">Nodo Raíz</button>
+        <button onclick="selectGlossary('padresHijos')" class="gloss-btn bg-slate-700 hover:bg-blue-600 px-3 py-1.5 rounded text-xs font-semibold transition">Padres e Hijos</button>
+        <button onclick="selectGlossary('hojas')" class="gloss-btn bg-slate-700 hover:bg-blue-600 px-3 py-1.5 rounded text-xs font-semibold transition">Hojas</button>
+        <button onclick="selectGlossary('rama')" class="gloss-btn bg-slate-700 hover:bg-blue-600 px-3 py-1.5 rounded text-xs font-semibold transition">Rama (Nodo Interno)</button>
+        <button onclick="selectGlossary('subarbol')" class="gloss-btn bg-slate-700 hover:bg-blue-600 px-3 py-1.5 rounded text-xs font-semibold transition">Subárbol</button>
+        <button onclick="selectGlossary('nivel')" class="gloss-btn bg-slate-700 hover:bg-blue-600 px-3 py-1.5 rounded text-xs font-semibold transition">Nivel</button>
+        <button onclick="selectGlossary('altura')" class="gloss-btn bg-slate-700 hover:bg-blue-600 px-3 py-1.5 rounded text-xs font-semibold transition">Altura</button>
+        <button onclick="selectGlossary('grado')" class="gloss-btn bg-slate-700 hover:bg-blue-600 px-3 py-1.5 rounded text-xs font-semibold transition">Grado</button>
+      </div>
+
+      <!-- Canvas de Demostración del Glosario -->
+      <div class="bg-slate-950 border border-slate-800 rounded-xl relative overflow-hidden flex-grow min-h-[380px] flex items-center justify-center">
+        <canvas id="gloss-canvas" width="1000" height="400" class="w-full h-full block"></canvas>
+      </div>
+
+      <!-- Panel Descriptivo del Concepto -->
+      <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl space-y-2">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+          <h3 id="gloss-title" class="font-bold text-blue-400 text-lg">Selecciona un concepto</h3>
+          <span id="gloss-result" class="text-xs font-mono bg-blue-900/40 text-blue-300 px-2.5 py-1 rounded border border-blue-700/50"></span>
+        </div>
+        <p id="gloss-desc" class="text-sm text-slate-300 leading-relaxed">Haz clic en cualquiera de los botones superiores para resaltar los nodos correspondientes en el lienzo y leer su definición técnica.</p>
+      </div>
+    </section>
+
+
+    <!-- ==================== MÓDULO 3: QUIZ INTERACTIVO ==================== -->
+    <section id="modulo-3" class="hidden flex-col gap-4 max-w-4xl mx-auto w-full">
+      <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+          <div>
+            <h2 class="text-xl font-bold text-white">Quiz de Evaluación con Árbol Dinámico</h2>
+            <p class="text-xs text-slate-400">Analiza el árbol adaptado en el lienzo y escribe el recorrido solicitado</p>
+          </div>
+          <span id="quiz-score" class="text-xs font-mono bg-indigo-900/40 text-indigo-300 px-3 py-1 rounded border border-indigo-700/50">Puntuación: 0 / 0</span>
+        </div>
+
+        <!-- Canvas del Quiz Responsivo con Desplazamiento -->
+        <div class="bg-slate-950 border border-slate-800 rounded-lg relative overflow-hidden h-60 flex items-center justify-center">
+          <div class="absolute top-2 left-2 z-10 bg-slate-900/80 border border-slate-700 text-slate-400 text-[10px] px-2 py-0.5 rounded backdrop-blur pointer-events-none">
+            🖐️ Arrastra o usa la rueda para desplazar/zoom
+          </div>
+          <div class="absolute top-2 right-2 z-10 flex gap-1 bg-slate-900/80 border border-slate-700 p-1 rounded backdrop-blur">
+            <button onclick="zoomCanvas('quiz', 1.2)" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-xs rounded text-slate-200 font-bold">+</button>
+            <button onclick="zoomCanvas('quiz', 0.8)" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-xs rounded text-slate-200 font-bold">-</button>
+            <button onclick="resetView('quiz')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-xs rounded text-slate-300 text-[11px]">Restablecer</button>
+          </div>
+          <canvas id="quiz-canvas" width="800" height="240" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+        </div>
+
+        <div id="quiz-container" class="space-y-3">
+          <h3 id="quiz-question" class="text-md font-semibold text-slate-200">Cargando pregunta...</h3>
+          
+          <div class="space-y-2 pt-2">
+            <label class="block text-xs text-amber-300 font-semibold uppercase tracking-wide">
+              💡 Ingresa los valores separados por comas (ejemplo: <span class="font-mono bg-slate-900 px-1.5 py-0.5 rounded text-white">12, 25, 37, 50</span>)
+            </label>
+            <div class="flex gap-2">
+              <input type="text" id="quiz-user-input" placeholder="Escribe tu respuesta aquí..." class="flex-grow bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono">
+              <button onclick="submitQuizAnswer()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition shadow-md">Verificar</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="quiz-feedback" class="hidden p-3 rounded-lg text-sm font-medium"></div>
+
+        <div class="flex justify-end pt-2">
+          <button id="next-question-btn" onclick="loadNextQuizQuestion()" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Siguiente Pregunta</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Lógica en JavaScript Puro (Vanilla JS) -->
+  <script>
+    // --- CLASES ESTRUCTURA DE DATOS (BST) ---
+    class BSTNode {
+      constructor(value) {
+        this.value = value;
+        this.left = null;
+        this.right = null;
+        this.x = 0;
+        this.y = 0;
+      }
+    }
+
+    class BinarySearchTree {
+      constructor() {
+        this.root = null;
+      }
+
+      insert(val, type = 'number') {
+        const parsedVal = type === 'number' ? parseInt(val, 10) : String(val);
+        const newNode = new BSTNode(parsedVal);
+        if (!this.root) {
+          this.root = newNode;
+          return true;
+        }
+        let current = this.root;
+        while (true) {
+          if (parsedVal === current.value) return false;
+          if (parsedVal < current.value) {
+            if (!current.left) { current.left = newNode; return true; }
+            current = current.left;
+          } else {
+            if (!current.right) { current.right = newNode; return true; }
+            current = current.right;
+          }
+        }
+      }
+
+      delete(val, type = 'number') {
+        const parsedVal = type === 'number' ? parseInt(val, 10) : String(val);
+        let deleted = false;
+        const removeNode = (node, key) => {
+          if (!node) return null;
+          if (key < node.value) {
+            node.left = removeNode(node.left, key);
+            return node;
+          } else if (key > node.value) {
+            node.right = removeNode(node.right, key);
+            return node;
+          } else {
+            deleted = true;
+            if (!node.left && !node.right) return null;
+            if (!node.left) return node.right;
+            if (!node.right) return node.left;
+            let temp = node.right;
+            while (temp.left) temp = temp.left;
+            node.value = temp.value;
+            node.right = removeNode(node.right, temp.value);
+            return node;
+          }
+        };
+        this.root = removeNode(this.root, parsedVal);
+        return deleted;
+      }
+
+      getHeight(node = this.root) {
+        if (!node) return 0;
+        return 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right));
+      }
+
+      getNodeCount(node = this.root) {
+        if (!node) return 0;
+        return 1 + this.getNodeCount(node.left) + this.getNodeCount(node.right);
+      }
+
+      getLeaves(node = this.root, acc = []) {
+        if (!node) return acc;
+        if (!node.left && !node.right) acc.push(node.value);
+        this.getLeaves(node.left, acc);
+        this.getLeaves(node.right, acc);
+        return acc;
+      }
+
+      getMin(node = this.root) {
+        if (!node) return null;
+        while (node.left) node = node.left;
+        return node.value;
+      }
+
+      getMax(node = this.root) {
+        if (!node) return null;
+        while (node.right) node = node.right;
+        return node.value;
+      }
+    }
+
+    // --- VARIABLES GLOBALES Y CONTROL DE VISTA (PAN & ZOOM) ---
+    const bst = new BinarySearchTree();
+    let currentModule = 1;
+
+    const simCanvas = document.getElementById('sim-canvas');
+    const simCtx = simCanvas.getContext('2d');
+
+    const glossCanvas = document.getElementById('gloss-canvas');
+    const glossCtx = glossCanvas.getContext('2d');
+
+    const quizCanvas = document.getElementById('quiz-canvas');
+    const quizCtx = quizCanvas.getContext('2d');
+
+    const viewState = {
+      sim: { offsetX: 0, offsetY: 0, scale: 1, isDragging: false, startX: 0, startY: 0 },
+      quiz: { offsetX: 0, offsetY: 0, scale: 1, isDragging: false, startX: 0, startY: 0 }
+    };
+
+    let simHighlights = {};
+    let simPulse = false;
+    let glossHighlights = {};
+    let glossLabels = {};
+
+    function setupPanZoom(canvas, type) {
+      const state = viewState[type];
+
+      canvas.addEventListener('mousedown', (e) => {
+        state.isDragging = true;
+        state.startX = e.clientX - state.offsetX;
+        state.startY = e.clientY - state.offsetY;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!state.isDragging) return;
+        state.offsetX = e.clientX - state.startX;
+        state.offsetY = e.clientY - state.startY;
+      });
+
+      window.addEventListener('mouseup', () => { state.isDragging = false; });
+
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+        state.scale *= zoomFactor;
+        state.scale = Math.min(Math.max(0.4, state.scale), 3.0);
+      }, { passive: false });
+    }
+
+    function zoomCanvas(type, factor) {
+      viewState[type].scale *= factor;
+      viewState[type].scale = Math.min(Math.max(0.4, viewState[type].scale), 3.0);
+    }
+
+    function resetView(type) {
+      viewState[type].offsetX = 0;
+      viewState[type].offsetY = 0;
+      viewState[type].scale = 1;
+    }
+
+    // --- NAVEGACIÓN ENTRE MÓDULOS ---
+    function switchModule(modNum) {
+      currentModule = modNum;
+      [1, 2, 3].forEach(i => {
+        const modEl = document.getElementById(`modulo-${i}`);
+        const btnEl = document.getElementById(`btn-mod${i}`);
+        if (i === modNum) {
+          modEl.classList.remove('hidden');
+          modEl.classList.add('flex');
+          btnEl.classList.add('active-tab');
+          btnEl.classList.remove('text-slate-400');
+        } else {
+          modEl.classList.add('hidden');
+          modEl.classList.remove('flex');
+          btnEl.classList.remove('active-tab');
+          btnEl.classList.add('text-slate-400');
+        }
+      });
+
+      if (modNum === 2) selectGlossary('rama');
+      if (modNum === 3) initQuiz();
+    }
+
+    // --- MÓDULO 1: SIMULADOR VISUAL ---
+    function handleTypeChange() {
+      clearTree();
+      const type = document.getElementById('data-type').value;
+      const input = document.getElementById('node-value');
+      input.placeholder = type === 'number' ? 'Número entero...' : 'Letra (A-Z)...';
+    }
+
+    function insertNode() {
+      const input = document.getElementById('node-value');
+      const val = input.value.trim();
+      const type = document.getElementById('data-type').value;
+
+      if (!val) return;
+
+      if (type === 'number') {
+        if (!/^-?\d+$/.test(val)) {
+          updateLog('Error: Solo se aceptan números enteros.', 'text-rose-400');
+          return;
+        }
+      } else {
+        if (!/^[a-zA-Z]+$/.test(val)) {
+          updateLog('Error: Solo se aceptan caracteres alfabéticos (letras).', 'text-rose-400');
+          return;
+        }
+      }
+
+      const inserted = bst.insert(type === 'string' ? val.toUpperCase() : val, type);
+      if (inserted) {
+        updateLog(`Nodo '${val}' insertado correctamente.`, 'text-emerald-400');
+        input.value = '';
+        updateStats();
+        simHighlights = {};
+        simPulse = false;
+      } else {
+        updateLog(`El valor '${val}' ya existe en el árbol.`, 'text-amber-400');
+      }
+    }
+
+    function searchNode() {
+      const input = document.getElementById('node-value');
+      const val = input.value.trim();
+      const type = document.getElementById('data-type').value;
+
+      if (!val || !bst.root) return;
+      const target = type === 'number' ? parseInt(val, 10) : val.toUpperCase();
+      let current = bst.root;
+      let found = false;
+
+      while (current) {
+        if (current.value === target) { found = true; break; }
+        current = target < current.value ? current.left : current.right;
+      }
+
+      if (found) {
+        updateLog(`¡Nodo '${val}' encontrado en el árbol!`, 'text-emerald-400');
+        simHighlights = { [target]: '#10b981' };
+        simPulse = true;
+      } else {
+        updateLog(`El nodo '${val}' no existe en el árbol.`, 'text-rose-400');
+        simHighlights = {};
+      }
+    }
+
+    function deleteNode() {
+      const input = document.getElementById('node-value');
+      const val = input.value.trim();
+      const type = document.getElementById('data-type').value;
+
+      if (!val || !bst.root) return;
+      const deleted = bst.delete(type === 'string' ? val.toUpperCase() : val, type);
+      if (deleted) {
+        updateLog(`Nodo '${val}' eliminado.`, 'text-emerald-400');
+        input.value = '';
+        updateStats();
+        simHighlights = {};
+        simPulse = false;
+      } else {
+        updateLog(`No se pudo eliminar: el nodo '${val}' no existe.`, 'text-amber-400');
+      }
+    }
+
+    function generateRandomTree() {
+      bst.root = null;
+      const type = document.getElementById('data-type').value;
+      const count = 7;
+      for (let i = 0; i < count; i++) {
+        if (type === 'number') {
+          bst.insert(Math.floor(Math.random() * 90) + 10, 'number');
+        } else {
+          const char = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+          bst.insert(char, 'string');
+        }
+      }
+      updateLog('Árbol aleatorio generado.', 'text-blue-400');
+      updateStats();
+      simHighlights = {};
+      simPulse = false;
+      resetView('sim');
+    }
+
+    function clearTree() {
+      bst.root = null;
+      updateLog('El árbol está vacío. Inserta un nodo o presiona 'Aleatorio' para comenzar.', 'text-blue-400');
+      updateStats();
+      simHighlights = {};
+      simPulse = false;
+      resetView('sim');
+    }
+
+    function updateStats() {
+      document.getElementById('stat-height').innerText = bst.getHeight();
+      document.getElementById('stat-count').innerText = bst.getNodeCount();
+      const leaves = bst.getLeaves();
+      document.getElementById('stat-leaves').innerText = leaves.length > 0 ? leaves.join(', ') : 'Ninguna';
+      document.getElementById('stat-min').innerText = bst.getMin() ?? '-';
+      document.getElementById('stat-max').innerText = bst.getMax() ?? '-';
+    }
+
+    function updateLog(msg, colorClass = 'text-blue-400') {
+      const log = document.getElementById('sim-log');
+      log.className = colorClass;
+      log.innerText = msg;
+    }
+
+    // --- RECORRIDOS ANIMADOS ---
+    async function animateTraversal(type) {
+      if (!bst.root) return;
+      const result = [];
+
+      const inOrder = (node) => { if (node) { inOrder(node.left); result.push(node); inOrder(node.right); } };
+      const preOrder = (node) => { if (node) { result.push(node); preOrder(node.left); preOrder(node.right); } };
+      const postOrder = (node) => { if (node) { postOrder(node.left); postOrder(node.right); result.push(node); } };
+
+      if (type === 'inorder') inOrder(bst.root);
+      if (type === 'preorder') preOrder(bst.root);
+      if (type === 'postorder') postOrder(bst.root);
+
+      const speedVal = parseFloat(document.getElementById('anim-speed').value);
+      const delay = Math.max(200, 800 / speedVal);
+      const traversedValues = [];
+
+      for (let i = 0; i < result.length; i++) {
+        const node = result[i];
+        traversedValues.push(node.value);
+        updateLog(`Recorrido ${type.toUpperCase()}: [ ${traversedValues.join(', ')} ] (Visitando: ${node.value})`, 'text-indigo-300');
+        simHighlights = { [node.value]: '#f59e0b' };
+        simPulse = true;
+        await new Promise(r => setTimeout(r, delay));
+      }
+      updateLog(`¡Recorrido ${type.toUpperCase()} completado!: [ ${traversedValues.join(', ')} ]`, 'text-emerald-400');
+      simHighlights = {};
+      simPulse = false;
+    }
+
+    // --- RENDERIZADO GENERAL EN CANVAS ---
+    function calculateCoordinates(node, x, y, gap) {
+      if (!node) return;
+      node.x = x;
+      node.y = y;
+      if (node.left) calculateCoordinates(node.left, x - gap, y + 55, gap / 1.9);
+      if (node.right) calculateCoordinates(node.right, x + gap, y + 55, gap / 1.9);
+    }
+
+    function drawConnections(ctx, node) {
+      if (!node) return;
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+
+      if (node.left) {
+        ctx.beginPath();
+        ctx.moveTo(node.x, node.y);
+        ctx.lineTo(node.left.x, node.left.y);
+        ctx.stroke();
+        drawConnections(ctx, node.left);
+      }
+      if (node.right) {
+        ctx.beginPath();
+        ctx.moveTo(node.x, node.y);
+        ctx.lineTo(node.right.x, node.right.y);
+        ctx.stroke();
+        drawConnections(ctx, node.right);
+      }
+    }
+
+    function drawNodes(ctx, node, highlights = {}, labels = {}, pulse = false) {
+      if (!node) return;
+
+      const isHighlighted = highlights[node.value];
+      const color = isHighlighted || '#3b82f6';
+
+      if (pulse && isHighlighted) {
+        const time = Date.now() / 200;
+        const dynamicRadius = 24 + Math.sin(time) * 4;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, dynamicRadius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, 18, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(node.value, node.x, node.y);
+
+      if (labels[node.value]) {
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '10px sans-serif';
+        ctx.fillText(labels[node.value], node.x, node.y - 25);
+      }
+
+      drawNodes(ctx, node.left, highlights, labels, pulse);
+      drawNodes(ctx, node.right, highlights, labels, pulse);
+    }
+
+    // --- MÓDULO 2: GLOSARIO DINÁMICO ---
+    const glossTree = new BinarySearchTree();
+    [50, 30, 70, 20, 40, 60, 80].forEach(v => glossTree.insert(v, 'number'));
+
+    const glossData = {
+      raiz: { title: "Nodo Raíz", desc: "El nodo raíz es el origen de todo el árbol (nivel 0). No tiene un nodo padre.", highlights: { 50: '#10b981' }, labels: { 50: 'Raíz' }, result: "Raíz: 50" },
+      padresHijos: { title: "Padres e Hijos", desc: "Cada nodo interno actúa como padre: el 50 es padre de 30 y 70; el 30 es padre de 20 y 40; el 70 es padre de 60 y 80.", highlights: { 50: '#f59e0b', 30: '#f59e0b', 70: '#f59e0b', 20: '#3b82f6', 40: '#3b82f6', 60: '#3b82f6', 80: '#3b82f6' }, labels: { 50: 'Padre', 30: 'Padre', 70: 'Padre', 20: 'Hijo', 40: 'Hijo', 60: 'Hijo', 80: 'Hijo' }, result: "Padres: 50, 30, 70 | Hijos: 20, 40, 60, 80" },
+      hojas: { title: "Nodos Hoja", desc: "Un nodo hoja es aquel que no posee ningún hijo (su grado es 0).", highlights: { 20: '#10b981', 40: '#10b981', 60: '#10b981', 80: '#10b981' }, labels: { 20: 'Hoja', 40: 'Hoja', 60: 'Hoja', 80: 'Hoja' }, result: "Hojas encontradas: 20, 40, 60, 80" },
+      rama: { title: "Nodo Rama (Interno)", desc: "Un nodo rama o interno es cualquier nodo que tiene al menos un hijo y no es la raíz.", highlights: { 30: '#8b5cf6', 70: '#8b5cf6', 50: '#3b82f6' }, labels: { 50: 'Raíz', 30: 'Rama', 70: 'Rama' }, result: "Ramas encontradas: 30, 70" },
+      subarbol: { title: "Subárboles (Izquierdo y Derecho)", desc: "Se muestran ambos subárboles completos: el izquierdo con raíz en 30 y el derecho con raíz en 70.", highlights: { 30: '#ec4899', 20: '#ec4899', 40: '#ec4899', 70: '#06b6d4', 60: '#06b6d4', 80: '#06b6d4' }, labels: { 30: 'Sub. Izq.', 70: 'Sub. Der.' }, result: "Subárbol Izq: {30,20,40} | Subárbol Der: {70,60,80}" },
+      nivel: { title: "Nivel de un Nodo", desc: "El nivel representa la distancia desde la raíz (Raíz = Nivel 0, sus hijos = Nivel 1, etc.).", highlights: { 20: '#06b6d4', 40: '#06b6d4', 60: '#06b6d4', 80: '#06b6d4' }, labels: { 20: 'Nivel 2', 40: 'Nivel 2', 60: 'Nivel 2', 80: 'Nivel 2' }, result: "Nodos en Nivel 2: 20, 40, 60, 80" },
+      altura: { title: "Altura del Árbol", desc: "La altura es la longitud del camino más largo desde la raíz hasta la hoja más lejana.", highlights: { 50: '#f43f5e', 30: '#f43f5e', 20: '#f43f5e' }, labels: { 50: 'Niv. 0', 30: 'Niv. 1', 20: 'Niv. 2' }, result: "Altura del Árbol = 3" },
+      grado: { title: "Grado de un Nodo", desc: "El grado es el número de hijos directos que tiene un nodo (máximo 2).", highlights: { 50: '#8b5cf6', 30: '#8b5cf6', 70: '#8b5cf6' }, labels: { 50: 'Grado 2', 30: 'Grado 2', 70: 'Grado 2' }, result: "Nodos de Grado 2: 50, 30, 70" }
+    };
+
+    function selectGlossary(term) {
+      const data = glossData[term];
+      if (!data) return;
+
+      document.getElementById('gloss-title').innerText = data.title;
+      document.getElementById('gloss-desc').innerText = data.desc;
+      document.getElementById('gloss-result').innerText = data.result;
+
+      glossHighlights = data.highlights;
+      glossLabels = data.labels;
+    }
+
+    // --- MÓDULO 3: QUIZ INTERACTIVO ---
+    let quizTree = null;
+    let quizCurrentQuestion = null;
+    let quizScore = 0;
+    let quizTotalAnswered = 0;
+    let quizAnsweredFlag = false;
+
+    function initQuiz() {
+      quizScore = 0;
+      quizTotalAnswered = 0;
+      loadNextQuizQuestion();
+    }
+
+    function loadNextQuizQuestion() {
+      quizAnsweredFlag = false;
+      document.getElementById('quiz-feedback').classList.add('hidden');
+      document.getElementById('next-question-btn').classList.add('hidden');
+      document.getElementById('quiz-user-input').value = '';
+
+      quizTree = new BinarySearchTree();
+      const nums = [50, 25, 75, 12, 37, 62, 87].sort(() => Math.random() - 0.5);
+      nums.forEach(n => quizTree.insert(n, 'number'));
+
+      resetView('quiz');
+
+      const inorderList = [];
+      const preorderList = [];
+      const postorderList = [];
+
+      const getIn = (n) => { if (n) { getIn(n.left); inorderList.push(n.value); getIn(n.right); } };
+      const getPre = (n) => { if (n) { preorderList.push(n.value); getPre(n.left); getPre(n.right); } };
+      const getPost = (n) => { if (n) { getPost(n.left); getPost(n.right); postorderList.push(n.value); } };
+
+      getIn(quizTree.root);
+      getPre(quizTree.root);
+      getPost(quizTree.root);
+
+      const questionTypes = [
+        { q: `Escribe el resultado del recorrido In-Orden (Izquierda -> Raíz -> Derecha):`, correctVal: inorderList.join(', ') },
+        { q: `Escribe el recorrido Pre-Orden (Raíz -> Izquierda -> Derecha):`, correctVal: preorderList.join(', ') },
+        { q: `Escribe el recorrido Post-Orden (Izquierda -> Derecha -> Raíz):`, correctVal: postorderList.join(', ') }
+      ];
+
+      const selectedQ = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+      quizCurrentQuestion = selectedQ;
+
+      document.getElementById('quiz-question').innerText = selectedQ.q;
+      document.getElementById('quiz-score').innerText = `Puntuación: ${quizScore} / ${quizTotalAnswered}`;
+    }
+
+    function submitQuizAnswer() {
+      if (quizAnsweredFlag) return;
+      
+      const userInput = document.getElementById('quiz-user-input').value.trim();
+      if (!userInput) return;
+
+      quizAnsweredFlag = true;
+      quizTotalAnswered++;
+
+      const normalize = (str) => str.split(',').map(s => s.trim()).filter(Boolean).join(', ');
+      const userClean = normalize(userInput);
+      const correctClean = normalize(quizCurrentQuestion.correctVal);
+
+      const feedbackEl = document.getElementById('quiz-feedback');
+      feedbackEl.classList.remove('hidden');
+
+      if (userClean === correctClean) {
+        quizScore++;
+        feedbackEl.className = 'p-3 rounded-lg text-sm font-medium bg-emerald-950/60 border border-emerald-700 text-emerald-300';
+        feedbackEl.innerText = '¡Correcto! Excelente análisis del recorrido.';
+      } else {
+        feedbackEl.className = 'p-3 rounded-lg text-sm font-medium bg-rose-950/60 border border-rose-700 text-rose-300';
+        feedbackEl.innerText = `Incorrecto. La respuesta correcta era: ${quizCurrentQuestion.correctVal}`;
+      }
+
+      document.getElementById('quiz-score').innerText = `Puntuación: ${quizScore} / ${quizTotalAnswered}`;
+      document.getElementById('next-question-btn').classList.remove('hidden');
+    }
+
+    // --- BUCLE DE RENDERIZADO CONTINUO (REQUEST ANIMATION FRAME) ---
+    function gameLoop() {
+      if (currentModule === 1) {
+        simCtx.clearRect(0, 0, simCanvas.width, simCanvas.height);
+        if (!bst.root) {
+          simCtx.fillStyle = '#64748b';
+          simCtx.font = '14px sans-serif';
+          simCtx.textAlign = 'center';
+          simCtx.fillText("El árbol está vacío. Inserta un nodo o presiona 'Aleatorio' para comenzar.", simCanvas.width / 2, simCanvas.height / 2);
+        } else {
+          simCtx.save();
+          simCtx.translate(viewState.sim.offsetX, viewState.sim.offsetY);
+          simCtx.scale(viewState.sim.scale, viewState.sim.scale);
+
+          calculateCoordinates(bst.root, simCanvas.width / 2, 45, simCanvas.width / 4);
+          drawConnections(simCtx, bst.root);
+          drawNodes(simCtx, bst.root, simHighlights, {}, simPulse);
+
+          simCtx.restore();
+        }
+      }
+
+      if (currentModule === 2) {
+        glossCtx.clearRect(0, 0, glossCanvas.width, glossCanvas.height);
+        if (glossTree.root) {
+          calculateCoordinates(glossTree.root, glossCanvas.width / 2, 45, glossCanvas.width / 4);
+          drawConnections(glossCtx, glossTree.root);
+          drawNodes(glossCtx, glossTree.root, glossHighlights, glossLabels, true);
+        }
+      }
+
+      if (currentModule === 3) {
+        quizCtx.clearRect(0, 0, quizCanvas.width, quizCanvas.height);
+        if (quizTree && quizTree.root) {
+          quizCtx.save();
+          quizCtx.translate(viewState.quiz.offsetX, viewState.quiz.offsetY);
+          quizCtx.scale(viewState.quiz.scale, viewState.quiz.scale);
+
+          calculateCoordinates(quizTree.root, quizCanvas.width / 2, 30, quizCanvas.width / 4.2);
+          drawConnections(quizCtx, quizTree.root);
+          drawNodes(quizCtx, quizTree.root, {}, {}, true);
+
+          quizCtx.restore();
+        }
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    window.onload = () => {
+      setupPanZoom(simCanvas, 'sim');
+      setupPanZoom(quizCanvas, 'quiz');
+      requestAnimationFrame(gameLoop);
+    };
+  </script>
+</body>
+</html>
