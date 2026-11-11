@@ -1,12 +1,12 @@
-# ArbolEduCJ 🌲
+# ArbolEduCJ
 
-**ArbolEduCJ** es una aplicación web educativa interactiva y de código abierto diseñada para aprender, simular y evaluar conceptos de **Árboles Binarios de Búsqueda (BST)** en tiempo real. 
+**ArbolEduCJ** es una aplicación web educativa interactiva y de código abierto diseñada para aprender, simular y evaluar conceptos de **Árboles Binarios de Búsqueda (BST)** en tiempo real.
 
 Desarrollada con **JavaScript puro (ES6+)**, **Tailwind CSS** y **HTML5 Canvas**, cuenta con una arquitectura de cero dependencias externas de librerías de terceros para estructuras de datos.
 
 ---
 
-## 🚀 Características Principales
+## Características Principales
 
 1. **Módulo 1: Simulador Visual Interactivo**
    - Inserción, búsqueda y eliminación dinámica de nodos.
@@ -24,14 +24,14 @@ Desarrollada con **JavaScript puro (ES6+)**, **Tailwind CSS** y **HTML5 Canvas**
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 - **HTML5 & Canvas API** para renderizado gráfico con soporte de animación fluida (`requestAnimationFrame`).
 - **Tailwind CSS** (via CDN) para un diseño moderno, responsivo y modo oscuro.
 - **JavaScript (Vanilla ES6+)** con clases personalizadas (`BSTNode`, `BinarySearchTree`).
 
 ---
 
-## 📦 Cómo Ejecutar Localmente
+## Cómo Ejecutar Localmente
 
 1. Clona este repositorio:
    ```bash
