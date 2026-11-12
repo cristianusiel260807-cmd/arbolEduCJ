@@ -342,6 +342,21 @@
 
     let simHighlights = {};
     let simPulse = false;
+
+    let operationBusy=false;
+    const operationPause=()=>new Promise(resolve=>{const speed=parseFloat(document.getElementById("anim-speed").value)||1;setTimeout(resolve,Math.max(180,650/speed));});
+    async function animateOperationPath(target){
+      let current=bst.root;let found=false;
+      while(current){
+        simHighlights={[current.value]:"#f59e0b"};simPulse=true;
+        updateLog("Recorriendo: comparando con "+current.value,"text-amber-300");
+        await operationPause();
+        if(current.value===target){found=true;simHighlights={[current.value]:"#10b981"};break;}
+        current=target<current.value?current.left:current.right;
+      }
+      return found;
+    }
+
     let glossHighlights = {};
     let glossLabels = {};
 
@@ -412,89 +427,36 @@
       input.placeholder = type === 'number' ? 'Número entero...' : 'Letra (A-Z)...';
     }
 
-    function insertNode() {
-      const input = document.getElementById('node-value');
-      const val = input.value.trim();
-      const type = document.getElementById('data-type').value;
-
-      if (!val) return;
-
-      if (type === 'number') {
-        if (!/^-?\d+$/.test(val)) {
-          updateLog('Error: Solo se aceptan números enteros.', 'text-rose-400');
-          return;
-        }
-      } else {
-        // En el modo alfabético, cada nodo admite exactamente una letra.
-        // Se incluyen letras del español como Ñ y vocales acentuadas.
-        if (!/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]$/u.test(val)) {
-          updateLog('Error: En el modo alfabético solo se permite una letra por nodo.', 'text-rose-400');
-          return;
-        }
-      }
-
-      const inserted = bst.insert(type === 'string' ? val.toUpperCase() : val, type);
-      if (inserted) {
-        updateLog(`Nodo '${val}' insertado correctamente. Se permiten valores duplicados.`, 'text-emerald-400');
-        input.value = '';
-        updateStats();
-        simHighlights = {};
-        simPulse = false;
-      }
+    async function insertNode(){
+      if(operationBusy)return;
+      const input=document.getElementById("node-value"),val=input.value.trim(),type=document.getElementById("data-type").value;
+      if(!val)return;
+      if(type==="number"&&!/^-?[0-9]+$/.test(val)){updateLog("Error: Solo se aceptan números enteros.","text-rose-400");return;}
+      if(type==="string"&&!/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]$/u.test(val)){updateLog("Error: Solo se permite una letra por nodo.","text-rose-400");return;}
+      const target=type==="number"?Number(val):val.toUpperCase();operationBusy=true;
+      try{
+        let current=bst.root;
+        while(current){simHighlights={[current.value]:"#f59e0b"};simPulse=true;updateLog("Insertando: comparación con "+current.value,"text-amber-300");await operationPause();if(target<current.value){if(!current.left)break;current=current.left;}else{if(!current.right)break;current=current.right;}}
+        bst.insert(target,type);simHighlights={[target]:"#10b981"};simPulse=true;updateStats();input.value="";updateLog("Nodo "+target+" insertado. Recorrido completado.","text-emerald-400");await operationPause();simHighlights={};simPulse=false;
+      }finally{operationBusy=false;}
     }
 
-    function searchNode() {
-      const input = document.getElementById('node-value');
-      const val = input.value.trim();
-      const type = document.getElementById('data-type').value;
-
-      if (!val || !bst.root) return;
-      const target = type === 'number' ? parseInt(val, 10) : val.toUpperCase();
-      let current = bst.root;
-      let found = false;
-
-      while (current) {
-        if (current.value === target) { found = true; break; }
-        current = target < current.value ? current.left : current.right;
-      }
-
-      if (found) {
-        updateLog(`¡Nodo '${val}' encontrado en el árbol!`, 'text-emerald-400');
-        simHighlights = { [target]: '#10b981' };
-        simPulse = true;
-      } else {
-        updateLog(`El nodo '${val}' no existe en el árbol.`, 'text-rose-400');
-        simHighlights = {};
-      }
+    async function searchNode(){
+      if(operationBusy)return;const input=document.getElementById("node-value"),val=input.value.trim(),type=document.getElementById("data-type").value;if(!val||!bst.root)return;
+      if(type==="number"&&!/^-?[0-9]+$/.test(val)){updateLog("Ingresa un número entero para buscar.","text-rose-400");return;}
+      if(type==="string"&&!/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]$/u.test(val)){updateLog("Ingresa una sola letra para buscar.","text-rose-400");return;}
+      const target=type==="number"?Number(val):val.toUpperCase();operationBusy=true;
+      try{const found=await animateOperationPath(target);updateLog(found?"Nodo "+target+" encontrado.":"El nodo "+target+" no existe; se mostró el camino de búsqueda.",found?"text-emerald-400":"text-rose-400");if(!found){await operationPause();simHighlights={};simPulse=false;}}
+      finally{operationBusy=false;}
     }
 
-    function deleteNode() {
-      const input = document.getElementById('node-value');
-      const val = input.value.trim();
-      const type = document.getElementById('data-type').value;
-
-      if (!val || !bst.root) return;
-
-      // Valida el dato según el modo seleccionado antes de buscarlo/eliminarlo.
-      if (type === 'number' && !/^-?\d+$/.test(val)) {
-        updateLog('Error: En el modo Números solo puedes eliminar usando un número entero.', 'text-rose-400');
-        return;
-      }
-      if (type === 'string' && !/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]$/u.test(val)) {
-        updateLog('Error: En el modo Alfabético debes ingresar una sola letra.', 'text-rose-400');
-        return;
-      }
-
-      const deleted = bst.delete(type === 'string' ? val.toUpperCase() : val, type);
-      if (deleted) {
-        updateLog(`Nodo '${val}' eliminado.`, 'text-emerald-400');
-        input.value = '';
-        updateStats();
-        simHighlights = {};
-        simPulse = false;
-      } else {
-        updateLog(`No se pudo eliminar: el nodo '${val}' no existe.`, 'text-amber-400');
-      }
+    async function deleteNode(){
+      if(operationBusy)return;const input=document.getElementById("node-value"),val=input.value.trim(),type=document.getElementById("data-type").value;if(!val||!bst.root)return;
+      if(type==="number"&&!/^-?[0-9]+$/.test(val)){updateLog("Ingresa un número entero para eliminar.","text-rose-400");return;}
+      if(type==="string"&&!/^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ]$/u.test(val)){updateLog("Ingresa una sola letra para eliminar.","text-rose-400");return;}
+      const target=type==="number"?Number(val):val.toUpperCase();operationBusy=true;
+      try{const found=await animateOperationPath(target);if(!found){updateLog("El nodo "+target+" no existe.","text-rose-400");simHighlights={};simPulse=false;return;}simHighlights={[target]:"#f43f5e"};updateLog("Eliminando nodo "+target+"...","text-rose-300");await operationPause();const deleted=bst.delete(target,type);updateStats();simHighlights={};simPulse=false;updateLog(deleted?"Nodo "+target+" eliminado.":"No se pudo eliminar "+target+".",deleted?"text-emerald-400":"text-rose-400");if(deleted)input.value="";}
+      finally{operationBusy=false;}
     }
 
     function generateRandomTree() {
