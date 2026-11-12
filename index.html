@@ -132,6 +132,11 @@
         <button onclick="selectGlossary('grado')" class="gloss-btn bg-slate-700 hover:bg-blue-600 px-3 py-1.5 rounded text-xs font-semibold transition">Grado</button>
       </div>
 
+      <div class="flex flex-wrap justify-center gap-2">
+        <button onclick="selectGlossary('inorden')" class="gloss-btn bg-indigo-700 px-3 py-1.5 rounded text-xs">In-Orden</button>
+        <button onclick="selectGlossary('preorden')" class="gloss-btn bg-indigo-700 px-3 py-1.5 rounded text-xs">Pre-Orden</button>
+        <button onclick="selectGlossary('postorden')" class="gloss-btn bg-indigo-700 px-3 py-1.5 rounded text-xs">Post-Orden</button>
+      </div>
       <!-- Canvas de Demostración del Glosario -->
       <div class="bg-slate-950 border border-slate-800 rounded-xl relative overflow-hidden flex-grow min-h-[380px] flex items-center justify-center">
         <canvas id="gloss-canvas" width="1000" height="400" class="w-full h-full block"></canvas>
@@ -156,7 +161,7 @@
             <h2 class="text-xl font-bold text-white">Quiz de Evaluación con Árbol Dinámico</h2>
             <p class="text-xs text-slate-400">Analiza el árbol adaptado en el lienzo y escribe el recorrido solicitado</p>
           </div>
-          <span id="quiz-score" class="text-xs font-mono bg-indigo-900/40 text-indigo-300 px-3 py-1 rounded border border-indigo-700/50">Puntuación: 0 / 0</span>
+          <span id="quiz-score" class="text-xs font-mono bg-indigo-900/40 text-indigo-300 px-3 py-1 rounded border border-indigo-700/50">Pregunta 1 de 5</span>
         </div>
 
         <!-- Canvas del Quiz Responsivo con Desplazamiento -->
@@ -176,7 +181,7 @@
           <h3 id="quiz-question" class="text-md font-semibold text-slate-200">Cargando pregunta...</h3>
           
           <div class="space-y-2 pt-2">
-            <label class="block text-xs text-amber-300 font-semibold uppercase tracking-wide">
+            <label id="quiz-answer-label" class="block text-xs text-amber-300 font-semibold uppercase tracking-wide">
               💡 Ingresa los valores separados por comas (ejemplo: <span class="font-mono bg-slate-900 px-1.5 py-0.5 rounded text-white">12, 25, 37, 50</span>)
             </label>
             <div class="flex gap-2">
@@ -189,7 +194,7 @@
         <div id="quiz-feedback" class="hidden p-3 rounded-lg text-sm font-medium"></div>
 
         <div class="flex justify-end pt-2">
-          <button id="next-question-btn" onclick="loadNextQuizQuestion()" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Siguiente Pregunta</button>
+          <button id="next-question-btn" onclick="advanceQuiz()" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Siguiente Pregunta</button>
         </div>
       </div>
     </section>
@@ -647,6 +652,9 @@
       nivel: { title: "Nivel de un Nodo", desc: "El nivel representa la distancia desde la raíz (Raíz = Nivel 0, sus hijos = Nivel 1, etc.).", highlights: { 20: '#06b6d4', 40: '#06b6d4', 60: '#06b6d4', 80: '#06b6d4' }, labels: { 20: 'Nivel 2', 40: 'Nivel 2', 60: 'Nivel 2', 80: 'Nivel 2' }, result: "Nodos en Nivel 2: 20, 40, 60, 80" },
       altura: { title: "Altura del Árbol", desc: "La altura es la longitud del camino más largo desde la raíz hasta la hoja más lejana.", highlights: { 50: '#f43f5e', 30: '#f43f5e', 20: '#f43f5e' }, labels: { 50: 'Niv. 0', 30: 'Niv. 1', 20: 'Niv. 2' }, result: "Altura del Árbol = 3" },
       grado: { title: "Grado de un Nodo", desc: "El grado es el número de hijos directos que tiene un nodo (máximo 2).", highlights: { 50: '#8b5cf6', 30: '#8b5cf6', 70: '#8b5cf6' }, labels: { 50: 'Grado 2', 30: 'Grado 2', 70: 'Grado 2' }, result: "Nodos de Grado 2: 50, 30, 70" }
+      ,inorden:{title:"Recorrido In-Orden",desc:"Visita primero el subárbol izquierdo, después la raíz y finalmente el subárbol derecho. En un árbol binario de búsqueda muestra los valores de menor a mayor.",highlights:{20:"#10b981",30:"#10b981",40:"#10b981",50:"#10b981",60:"#10b981",70:"#10b981",80:"#10b981"},labels:{20:"1",30:"2",40:"3",50:"4",60:"5",70:"6",80:"7"},result:"Izquierda → Raíz → Derecha: 20, 30, 40, 50, 60, 70, 80"}
+      ,preorden:{title:"Recorrido Pre-Orden",desc:"Visita primero la raíz, luego el subárbol izquierdo y finalmente el derecho. Es útil para reconstruir la estructura del árbol.",highlights:{50:"#10b981",30:"#10b981",20:"#10b981",40:"#10b981",70:"#10b981",60:"#10b981",80:"#10b981"},labels:{50:"1",30:"2",20:"3",40:"4",70:"5",60:"6",80:"7"},result:"Raíz → Izquierda → Derecha: 50, 30, 20, 40, 70, 60, 80"}
+      ,postorden:{title:"Recorrido Post-Orden",desc:"Visita primero el subárbol izquierdo, después el derecho y deja la raíz para el final. Procesa los nodos desde las hojas hacia la raíz.",highlights:{20:"#10b981",40:"#10b981",30:"#10b981",60:"#10b981",80:"#10b981",70:"#10b981",50:"#10b981"},labels:{20:"1",40:"2",30:"3",60:"4",80:"5",70:"6",50:"7"},result:"Izquierda → Derecha → Raíz: 20, 40, 30, 60, 80, 70, 50"}
     };
 
     function selectGlossary(term) {
@@ -661,84 +669,42 @@
       glossLabels = data.labels;
     }
 
-    // --- MÓDULO 3: QUIZ INTERACTIVO ---
-    let quizTree = null;
-    let quizCurrentQuestion = null;
-    let quizScore = 0;
-    let quizTotalAnswered = 0;
-    let quizAnsweredFlag = false;
 
-    function initQuiz() {
-      quizScore = 0;
-      quizTotalAnswered = 0;
-      loadNextQuizQuestion();
+    // --- MÓDULO 3: QUIZ DE CINCO PREGUNTAS ---
+    let quizTree=null, quizCurrentQuestion=null, quizQuestions=[], quizScore=0, quizQuestionIndex=0, quizAnsweredFlag=false, quizFinished=false;
+    function initQuiz(){
+      quizScore=0;quizQuestionIndex=0;quizFinished=false;quizAnsweredFlag=false;
+      quizTree=new BinarySearchTree();[50,25,75,12,37,62,87].sort(()=>Math.random()-.5).forEach(n=>quizTree.insert(n,"number"));
+      const lists={in:[],pre:[],post:[]};
+      const walk=(n,t,a)=>{if(!n)return;if(t==="pre")a.push(n.value);walk(n.left,t,a);if(t==="in")a.push(n.value);walk(n.right,t,a);if(t==="post")a.push(n.value);};
+      walk(quizTree.root,"in",lists.in);walk(quizTree.root,"pre",lists.pre);walk(quizTree.root,"post",lists.post);
+      const ordering=[{kind:"order",q:"Organiza los datos: recorrido In-Orden (Izquierda, Raíz, Derecha).",a:lists.in.join(", ")},{kind:"order",q:"Organiza los datos: recorrido Pre-Orden (Raíz, Izquierda, Derecha).",a:lists.pre.join(", ")},{kind:"order",q:"Organiza los datos: recorrido Post-Orden (Izquierda, Derecha, Raíz).",a:lists.post.join(", ")}];
+      const theory=[{kind:"theory",q:"¿Cuántas hojas tiene este árbol?",a:String(quizTree.getLeaves().length)},{kind:"theory",q:"¿Cuántos nodos tiene el árbol?",a:String(quizTree.getNodeCount())},{kind:"theory",q:"¿Cuál es la altura del árbol?",a:String(quizTree.getHeight())},{kind:"theory",q:"¿Cuál es el valor de la raíz?",a:String(quizTree.root.value)},{kind:"theory",q:"¿Cuántas hojas tiene el subárbol izquierdo?",a:String(quizTree.getLeaves(quizTree.root.left).length)}];
+      quizQuestions=ordering.sort(()=>Math.random()-.5).slice(0,2).concat(theory.sort(()=>Math.random()-.5).slice(0,3)).sort(()=>Math.random()-.5);
+      document.getElementById("quiz-container").classList.remove("hidden");document.getElementById("quiz-canvas").parentElement.classList.remove("hidden");loadNextQuizQuestion();
     }
-
-    function loadNextQuizQuestion() {
-      quizAnsweredFlag = false;
-      document.getElementById('quiz-feedback').classList.add('hidden');
-      document.getElementById('next-question-btn').classList.add('hidden');
-      document.getElementById('quiz-user-input').value = '';
-
-      quizTree = new BinarySearchTree();
-      const nums = [50, 25, 75, 12, 37, 62, 87].sort(() => Math.random() - 0.5);
-      nums.forEach(n => quizTree.insert(n, 'number'));
-
-      resetView('quiz');
-
-      const inorderList = [];
-      const preorderList = [];
-      const postorderList = [];
-
-      const getIn = (n) => { if (n) { getIn(n.left); inorderList.push(n.value); getIn(n.right); } };
-      const getPre = (n) => { if (n) { preorderList.push(n.value); getPre(n.left); getPre(n.right); } };
-      const getPost = (n) => { if (n) { getPost(n.left); getPost(n.right); postorderList.push(n.value); } };
-
-      getIn(quizTree.root);
-      getPre(quizTree.root);
-      getPost(quizTree.root);
-
-      const questionTypes = [
-        { q: `Escribe el resultado del recorrido In-Orden (Izquierda -> Raíz -> Derecha):`, correctVal: inorderList.join(', ') },
-        { q: `Escribe el resultado del recorrido Pre-Orden (Raíz -> Izquierda -> Derecha):`, correctVal: preorderList.join(', ') },
-        { q: `Escribe el resultado del recorrido Post-Orden (Izquierda -> Derecha -> Raíz):`, correctVal: postorderList.join(', ') }
-      ];
-
-      const selectedQ = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-      quizCurrentQuestion = selectedQ;
-
-      document.getElementById('quiz-question').innerText = selectedQ.q;
-      document.getElementById('quiz-score').innerText = `Puntuación: ${quizScore} / ${quizTotalAnswered}`;
+    function loadNextQuizQuestion(){
+      if(quizQuestionIndex>=5){finishQuiz();return;}quizAnsweredFlag=false;quizCurrentQuestion=quizQuestions[quizQuestionIndex];
+      document.getElementById("quiz-feedback").classList.add("hidden");document.getElementById("next-question-btn").classList.add("hidden");document.getElementById("quiz-user-input").value="";
+      document.getElementById("quiz-question").innerText=quizCurrentQuestion.q;document.getElementById("quiz-score").innerText="Pregunta "+(quizQuestionIndex+1)+" de 5 | Aciertos: "+quizScore;
+      document.getElementById("quiz-answer-label").innerText=quizCurrentQuestion.kind==="order"?"Escribe los valores en el orden solicitado, separados por comas.":"Escribe únicamente la respuesta numérica.";resetView("quiz");
     }
-
-    function submitQuizAnswer() {
-      if (quizAnsweredFlag) return;
-      
-      const userInput = document.getElementById('quiz-user-input').value.trim();
-      if (!userInput) return;
-
-      quizAnsweredFlag = true;
-      quizTotalAnswered++;
-
-      const normalize = (str) => str.split(',').map(s => s.trim()).filter(Boolean).join(', ');
-      const userClean = normalize(userInput);
-      const correctClean = normalize(quizCurrentQuestion.correctVal);
-
-      const feedbackEl = document.getElementById('quiz-feedback');
-      feedbackEl.classList.remove('hidden');
-
-      if (userClean === correctClean) {
-        quizScore++;
-        feedbackEl.className = 'p-3 rounded-lg text-sm font-medium bg-emerald-950/60 border border-emerald-700 text-emerald-300';
-        feedbackEl.innerText = '¡Correcto! Excelente análisis del recorrido.';
-      } else {
-        feedbackEl.className = 'p-3 rounded-lg text-sm font-medium bg-rose-950/60 border border-rose-700 text-rose-300';
-        feedbackEl.innerText = `Incorrecto. La respuesta correcta era: ${quizCurrentQuestion.correctVal}`;
-      }
-
-      document.getElementById('quiz-score').innerText = `Puntuación: ${quizScore} / ${quizTotalAnswered}`;
-      document.getElementById('next-question-btn').classList.remove('hidden');
+    function submitQuizAnswer(){
+      if(quizAnsweredFlag||quizFinished)return;const v=document.getElementById("quiz-user-input").value.trim();if(!v)return;quizAnsweredFlag=true;
+      const norm=x=>x.split(",").map(z=>z.trim()).filter(Boolean).join(",");const correct=quizCurrentQuestion.kind==="order"?norm(v)===norm(quizCurrentQuestion.a):v===quizCurrentQuestion.a;
+      const f=document.getElementById("quiz-feedback");f.classList.remove("hidden");
+      if(correct){quizScore++;f.className="p-3 rounded-lg text-sm font-medium bg-emerald-950/60 border border-emerald-700 text-emerald-300";f.innerText="¡Correcto! Respuesta acertada.";}
+      else{f.className="p-3 rounded-lg text-sm font-medium bg-rose-950/60 border border-rose-700 text-rose-300";f.innerText="Incorrecto. La respuesta correcta era: "+quizCurrentQuestion.a;}
+      document.getElementById("quiz-score").innerText="Pregunta "+(quizQuestionIndex+1)+" de 5 | Aciertos: "+quizScore;
+      const b=document.getElementById("next-question-btn");b.innerText=quizQuestionIndex===4?"Ver calificación":"Siguiente pregunta";b.classList.remove("hidden");
     }
+    function finishQuiz(){
+      quizFinished=true;document.getElementById("quiz-container").classList.add("hidden");document.getElementById("quiz-canvas").parentElement.classList.add("hidden");
+      const f=document.getElementById("quiz-feedback");f.className="p-5 rounded-lg text-center bg-indigo-950/60 border border-indigo-700 text-indigo-200";
+      f.innerHTML="<div class='text-2xl font-bold mb-2'>Quiz terminado</div><div class='text-4xl font-extrabold mb-2'>"+quizScore+" / 5</div><div class='text-lg'>Calificación: "+(quizScore*20)+"/100</div>";f.classList.remove("hidden");
+      document.getElementById("quiz-score").innerText="Resultado final: "+quizScore+"/5";const b=document.getElementById("next-question-btn");b.innerText="Repetir quiz";b.classList.remove("hidden");
+    }
+    function advanceQuiz(){if(quizFinished){initQuiz();return;}if(!quizAnsweredFlag)return;quizQuestionIndex++;if(quizQuestionIndex>=5)finishQuiz();else loadNextQuizQuestion();}
 
     // --- BUCLE DE RENDERIZADO CONTINUO (REQUEST ANIMATION FRAME) ---
     function gameLoop() {
